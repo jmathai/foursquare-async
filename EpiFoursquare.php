@@ -201,7 +201,7 @@ class EpiFoursquareJson implements ArrayAccess, Countable, IteratorAggregate
     $this->responseText = $this->__resp->data;
     $this->headers      = $this->__resp->headers;
     $this->code         = $this->__resp->code;
-    if($accessible[$name])
+    if(isset($accessible[$name]) && $accessible[$name])
       return $this->$name;
     elseif(($this->code < 200 || $this->code >= 400) && !isset($accessible[$name]))
       EpiFoursquareException::raise($this->__resp, $this->debug);
@@ -218,7 +218,10 @@ class EpiFoursquareJson implements ArrayAccess, Countable, IteratorAggregate
       }
     }
 
-    return $this->$name;
+    if (property_exists($this, $name)) {
+      return $this->$name;
+    }
+    return null;
   }
 
   public function __isset($name)

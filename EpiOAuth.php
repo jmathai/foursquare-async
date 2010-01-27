@@ -333,6 +333,7 @@ class EpiOAuth
 class EpiOAuthResponse
 {
   private $__resp;
+  protected $debug = false;
 
   public function __construct($resp)
   {

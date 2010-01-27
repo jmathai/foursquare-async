@@ -350,7 +350,7 @@ class EpiOAuthResponse
       $this->$k = $v;
     }
 
-    return $result[$name];
+    return isset($result[$name]) ? $result[$name] : null;
   }
 
   public function __toString()

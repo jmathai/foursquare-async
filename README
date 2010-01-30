@@ -2,6 +2,7 @@ A port of Twitter-async for Foursquare.  This is a high performance wrapper for 
 
 Authors
    * jmathai
+   * dingram
    * falicon (originally did a port of an older version of this library)
 
 Documentation:

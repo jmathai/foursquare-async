@@ -1,9 +1,57 @@
 <?php
 class EpiCurl
 {
-  const timeout = 3;
-  static $inst = null;
-  static $singleton = 0;
+  private static $inst = array();
+  const multi = 'EpiCurlMulti';
+  const easy  = 'EpiCurlEasy';
+  public static function getInstance($mode = self::easy)
+  {
+    if(isset(self::$inst[$mode]))
+      return self::$inst[$mode];
+    
+    switch($mode)
+    {
+      case self::easy:
+        self::$inst[$mode] = EpiCurlEasy::getInstance(self::easy);
+        return self::$inst[$mode];
+      case self::multi:
+        self::$inst[$mode] = EpiCurlMulti::getInstance(self::multi);
+        return self::$inst[$mode];
+    }
+  }
+}
+
+class EpiCurlEasy extends EpiCurlAbstract
+{
+  protected function __construct() {}
+
+  public function addCurl($ch)
+  {
+    $key = $this->getKey($ch);
+    $this->responses[$key]['data'] = curl_exec($ch);
+    foreach($this->properties as $name => $prop)
+    {
+      $this->responses[$key][$name] = curl_getinfo($ch, $prop);
+    }
+    curl_close($ch);
+    return new EpiCurlResponse($key, $this);
+  }
+
+  public function getResult($key = null)
+  {
+    if($key !== null)
+    {
+      if(isset($this->responses[$key]['data']))
+        return $this->responses[$key];
+      else
+        return null;
+    }
+    return false;
+  }
+}
+
+class EpiCurlMulti extends EpiCurlAbstract
+{
   private $mc;
   private $msgs;
   private $running;
@@ -11,24 +59,10 @@ class EpiCurl
   private $selectStatus;
   private $sleepIncrement = 1.1;
   private $requests = array();
-  private $responses = array();
-  private $properties = array();
 
-  function __construct()
+  protected function __construct()
   {
-    if(self::$singleton == 0)
-    {
-      throw new Exception('This class cannot be instantiated by the new keyword.  You must instantiate it using: $obj = EpiCurl::getInstance();');
-    }
-
     $this->mc = curl_multi_init();
-    $this->properties = array(
-      'code'  => CURLINFO_HTTP_CODE,
-      'time'  => CURLINFO_TOTAL_TIME,
-      'length'=> CURLINFO_CONTENT_LENGTH_DOWNLOAD,
-      'type'  => CURLINFO_CONTENT_TYPE,
-      'url'   => CURLINFO_EFFECTIVE_URL
-      );
   }
 
   public function addCurl($ch)
@@ -46,7 +80,7 @@ class EpiCurl
           $code = $this->execStatus = curl_multi_exec($this->mc, $this->running);
       } while ($this->execStatus === CURLM_CALL_MULTI_PERFORM);
 
-      return new EpiCurlManager($key);
+      return new EpiCurlResponse($key, $this);
     }
     else
     {
@@ -56,7 +90,7 @@ class EpiCurl
 
   public function getResult($key = null)
   {
-    if($key != null)
+    if($key !== null)
     {
       if(isset($this->responses[$key]))
       {
@@ -90,11 +124,6 @@ class EpiCurl
     return false;
   }
 
-  private function getKey($ch)
-  {
-    return (string)$ch;
-  }
-
   private function headerCallback($ch, $header)
   {
     $_header = trim($header);
@@ -112,7 +141,7 @@ class EpiCurl
   {
     while($done = curl_multi_info_read($this->mc))
     {
-      $key = (string)$done['handle'];
+      $key = $this->getKey($done['handle']);
       $this->responses[$key]['data'] = curl_multi_getcontent($done['handle']);
       foreach($this->properties as $name => $const)
       {
@@ -122,28 +151,46 @@ class EpiCurl
       curl_close($done['handle']);
     }
   }
+}
 
-  static function getInstance()
+abstract class EpiCurlAbstract
+{
+  protected static $inst = null;
+  protected $responses = array();
+  protected $properties = array(
+    'code'  => CURLINFO_HTTP_CODE,
+    'time'  => CURLINFO_TOTAL_TIME,
+    'length'=> CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+    'type'  => CURLINFO_CONTENT_TYPE,
+    'url'   => CURLINFO_EFFECTIVE_URL
+    );
+
+  protected function getKey($ch)
   {
-    if(self::$inst == null)
-    {
-      self::$singleton = 1;
-      self::$inst = new EpiCurl();
-    }
+    return (string)$ch;
+  }
+
+  public static function getInstance($class)
+  {
+    if(self::$inst === null)
+      self::$inst = new $class();
 
     return self::$inst;
   }
+
+  abstract public function addCurl($ch);
+  abstract public function getResult($key = null);
 }
 
-class EpiCurlManager
+class EpiCurlResponse
 {
   private $key;
   private $epiCurl;
 
-  function __construct($key)
+  public function __construct($key, $epiCurl)
   {
     $this->key = $key;
-    $this->epiCurl = EpiCurl::getInstance();
+    $this->epiCurl = $epiCurl;
   }
 
   function __get($name)

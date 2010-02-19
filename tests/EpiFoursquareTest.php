@@ -45,6 +45,20 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
     $this->assertTrue($resp->checkin->id > 0, "Checkin id is not > 0");
   }
 
+  function testAsync()
+  {
+    $this->fsObj->useAsynchronous(true);
+    $resp = $this->fsObj->get('/friend/requests.json');
+    $this->assertTrue(is_array($resp->requests), "Requests is not an array");
+  }
+
+  function testSync()
+  {
+    $this->fsObj->useAsynchronous(false);
+    $resp = $this->fsObj->get('/friend/requests.json');
+    $this->assertTrue(is_array($resp->requests), "Requests is not an array");
+  }
+
 ///**
 //* @expectedException EpiTwitterNotAuthorizedException
 //*/

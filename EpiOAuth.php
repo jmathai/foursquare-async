@@ -190,13 +190,13 @@ class EpiOAuth
   }
 
   protected function httpDelete($url, $params) {
-      $this->addDefaultHeaders($url, $params['oauth']);
-      $ch = $this->curlInit($url);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $this->buildHttpQueryRaw($params['request']));
-      $resp = $this->curl->addCurl($ch);
-      $this->emptyHeaders();
-      return $resp;
+    $this->addDefaultHeaders($url, $params['oauth']);
+    $ch = $this->curlInit($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $this->buildHttpQueryRaw($params['request']));
+    $resp = curl_exec($ch); // $this->curl->addCurl($ch);
+    $this->emptyHeaders();
+    return array('data' => $resp, 'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE)); // $resp
   }
 
   protected function httpGet($url, $params = null)
@@ -212,10 +212,9 @@ class EpiOAuth
     }
     $this->addDefaultHeaders($url, $params['oauth']);
     $ch = $this->curlInit($url);
-    $resp  = $this->curl->addCurl($ch);
-    $this->emptyHeaders();
-
-    return $resp;
+    $resp  = curl_exec($ch); // $this->curl->addCurl($ch);
+    //$this->emptyHeaders();
+    return array('data' => $resp, 'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE)); // $resp
   }
 
   protected function httpPost($url, $params = null, $isMultipart)
@@ -229,9 +228,9 @@ class EpiOAuth
       curl_setopt($ch, CURLOPT_POSTFIELDS, $params['request']);
     else
       curl_setopt($ch, CURLOPT_POSTFIELDS, $this->buildHttpQueryRaw($params['request']));
-    $resp  = $this->curl->addCurl($ch);
-    $this->emptyHeaders();
-    return $resp;
+    $resp  = curl_exec($ch); // $this->curl->addCurl($ch);
+    //$this->emptyHeaders();
+    return array('data' => $resp, 'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE)); // $resp
   }
 
   protected function normalizeUrl($url = null)
@@ -326,7 +325,7 @@ class EpiOAuth
     $this->consumerKey = $consumerKey;
     $this->consumerSecret = $consumerSecret;
     $this->signatureMethod = $signatureMethod;
-    $this->curl = EpiCurl::getInstance();
+    //$this->curl = EpiCurl::getInstance();
   }
 }
 
@@ -342,10 +341,10 @@ class EpiOAuthResponse
 
   public function __get($name)
   {
-    if($this->__resp->code != 200)
+    if($this->__resp['code'] != 200)
       EpiOAuthException::raise($this->__resp, $this->debug);
 
-    parse_str($this->__resp->data, $result);
+    parse_str($this->__resp['data'], $result);
     foreach($result as $k => $v)
     {
       $this->$k = $v;
@@ -364,16 +363,16 @@ class EpiOAuthException extends Exception
 {
   public static function raise($response, $debug)
   {
-    $message = $response->responseText;
+    $message = $response['data'];
 
-    switch($response->code)
+    switch($response['code'])
     {
       case 400:
-        throw new EpiOAuthBadRequestException($message, $response->code);
+        throw new EpiOAuthBadRequestException($message, $response['code']);
       case 401:
-        throw new EpiOAuthUnauthorizedException($message, $response->code);
+        throw new EpiOAuthUnauthorizedException($message, $response['code']);
       default:
-        throw new EpiOAuthException($message, $response->code);
+        throw new EpiOAuthException($message, $response['code']);
     }
   }
 }

@@ -108,8 +108,8 @@ class EpiFoursquare extends EpiOAuth
   {
     $url = $this->getUrl($this->getApiUrl($endpoint));
     $resp= new EpiFoursquareJson(call_user_func(array($this, 'httpRequest'), $method, $url, $params, $this->isMultipart($params)), $this->debug);
-    if(!$this->isAsynchronous)
-      $resp->responseText;
+    //if(!$this->isAsynchronous)
+    //  $resp->responseText;
 
     return $resp;
   }
@@ -134,9 +134,11 @@ class EpiFoursquare extends EpiOAuth
     if(!empty($username) && !empty($password))
       curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
 
-    $resp = new EpiFoursquareJson(EpiCurl::getInstance()->addCurl($ch), $this->debug);
-    if(!$this->isAsynchronous)
-      $resp->responseText;
+    
+    $chResp = array('data' => curl_exec($ch), 'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE)); // $resp
+    $resp = new EpiFoursquareJson($resp/*EpiCurl::getInstance()->addCurl($ch)*/, $this->debug);
+    //if(!$this->isAsynchronous)
+    //  $resp->responseText;
 
     return $resp;
   }
@@ -202,9 +204,9 @@ class EpiFoursquareJson implements ArrayAccess, Countable, IteratorAggregate
   public function __get($name)
   {
     $accessible = array('responseText'=>1,'headers'=>1,'code'=>1);
-    $this->responseText = $this->__resp->data;
-    $this->headers      = $this->__resp->headers;
-    $this->code         = $this->__resp->code;
+    $this->responseText = $this->__resp['data']; //$this->__resp->data;
+    //$this->headers      = $this->__resp->headers;
+    $this->code         = $this->__resp['code']; //$this->__resp->code;
     if(isset($accessible[$name]) && $accessible[$name])
       return $this->$name;
     elseif(($this->code < 200 || $this->code >= 400) && !isset($accessible[$name]))

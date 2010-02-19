@@ -21,7 +21,7 @@ class EpiFoursquare extends EpiOAuth
   protected $apiUrl         = 'http://api.foursquare.com';
   protected $userAgent      = 'EpiFoursquare (http://github.com/jmathai/foursquare-async/tree/)';
   protected $apiVersion     = 'v1';
-  protected $isAsynchronous = false;
+  protected $isAsynchronous = EpiCurl::easy;
 
   /* OAuth methods */
   public function delete($endpoint, $params = null)
@@ -62,12 +62,13 @@ class EpiFoursquare extends EpiOAuth
 
   public function useAsynchronous($async = true)
   {
-    $this->isAsynchronous = (bool)$async;
+    $this->isAsynchronous = $async ? EpiCurl::multi : EpiCurl::easy;
+    $this->curl = EpiCurl::getInstance($this->isAsynchronous);
   }
 
   public function __construct($consumerKey = null, $consumerSecret = null, $oauthToken = null, $oauthTokenSecret = null)
   {
-    parent::__construct($consumerKey, $consumerSecret, self::EPIFOURSQUARE_SIGNATURE_METHOD);
+    parent::__construct($consumerKey, $consumerSecret, self::EPIFOURSQUARE_SIGNATURE_METHOD, $this->isAsynchronous);
     $this->setToken($oauthToken, $oauthTokenSecret);
   }
 
@@ -92,7 +93,6 @@ class EpiFoursquare extends EpiOAuth
 
       return $this->request_basic($method, $endpoint, $args, $username, $password);
     }
-
     return $this->request($method, $endpoint, $args);
   }
 
@@ -108,9 +108,6 @@ class EpiFoursquare extends EpiOAuth
   {
     $url = $this->getUrl($this->getApiUrl($endpoint));
     $resp= new EpiFoursquareJson(call_user_func(array($this, 'httpRequest'), $method, $url, $params, $this->isMultipart($params)), $this->debug);
-    //if(!$this->isAsynchronous)
-    //  $resp->responseText;
-
     return $resp;
   }
 
@@ -134,12 +131,7 @@ class EpiFoursquare extends EpiOAuth
     if(!empty($username) && !empty($password))
       curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
 
-    
-    $chResp = array('data' => curl_exec($ch), 'code' => curl_getinfo($ch, CURLINFO_HTTP_CODE)); // $resp
-    $resp = new EpiFoursquareJson($resp/*EpiCurl::getInstance()->addCurl($ch)*/, $this->debug);
-    //if(!$this->isAsynchronous)
-    //  $resp->responseText;
-
+    $resp = new EpiFoursquareJson(EpiCurl::getInstance($this->isAsynchronous)->addCurl($ch), $this->debug);
     return $resp;
   }
 }

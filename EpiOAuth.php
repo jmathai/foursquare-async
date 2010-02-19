@@ -2,7 +2,8 @@
 class EpiOAuth
 {
   public $version = '1.0';
-
+  public $curl;
+  
   protected $requestTokenUrl;
   protected $accessTokenUrl;
   protected $authenticateUrl;
@@ -320,12 +321,12 @@ class EpiOAuth
     return $retval;
   }
 
-  public function __construct($consumerKey, $consumerSecret, $signatureMethod='HMAC-SHA1')
+  public function __construct($consumerKey, $consumerSecret, $signatureMethod='HMAC-SHA1', $curlMode=EpiCurl::multi)
   {
     $this->consumerKey = $consumerKey;
     $this->consumerSecret = $consumerSecret;
     $this->signatureMethod = $signatureMethod;
-    //$this->curl = EpiCurl::getInstance();
+    $this->curl = EpiCurl::getInstance($curlMode);
   }
 }
 

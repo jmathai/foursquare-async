@@ -9,21 +9,54 @@
  * 
  *  @author Jaisen Mathai <jaisen@jmathai.com>
  */
-class EpiFoursquare extends EpiOAuth
+class EpiFoursquare
 {
-  const EPIFOURSQUARE_SIGNATURE_METHOD = 'HMAC-SHA1';
-  const EPIFOURSQUARE_AUTH_OAUTH = 'oauth';
-  const EPIFOURSQUARE_AUTH_BASIC = 'basic';
-  protected $requestTokenUrl= 'http://foursquare.com/oauth/request_token';
-  protected $accessTokenUrl = 'http://foursquare.com/oauth/access_token';
-  protected $authorizeUrl   = 'http://foursquare.com/oauth/authorize';
-  //protected $authenticateUrl= 'http://foursquare.com/oauth/authorize'; // In case four square implements sign in with like Twitter
-  protected $apiUrl         = 'http://api.foursquare.com';
+  protected $clientId, $clientSecret, $accessToken;
+  protected $requestTokenUrl= 'https://foursquare.com/oauth2/authenticate';
+  protected $accessTokenUrl = 'https://foursquare.com/oauth2/access_token';
+  protected $authorizeUrl   = 'https://foursquare.com/oauth/authorize';
+  protected $apiUrl         = 'https://api.foursquare.com';
   protected $userAgent      = 'EpiFoursquare (http://github.com/jmathai/foursquare-async/tree/)';
-  protected $apiVersion     = 'v1';
+  protected $apiVersion     = 'v2';
   protected $isAsynchronous = false;
+  protected $followLocation = false;
+  protected $connectionTimeout = 5;
+  protected $requestTimeout = 30;
+  protected $debug = false;
 
-  /* OAuth methods */
+  public function getAccessToken($code, $redirectUri)
+  {
+    $params = array('client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'grant_type' => 'authorization_code', 'redirect_uri' => $redirectUri, 'code' => $code);
+    $qs = http_build_query($params);
+    return $this->request('GET', "{$this->accessTokenUrl}?{$qs}");
+  }
+
+  public function getAuthorizeUrl($redirectUri)
+  {
+    $params = array('client_id' => $this->clientId, 'response_type' => 'code', 'redirect_uri' => $redirectUri);
+    $qs = http_build_query($params);
+    return "{$this->requestTokenUrl}?{$qs}";
+  }
+
+  public function setTimeout($requestTimeout = null, $connectionTimeout = null)
+  {
+    if($requestTimeout !== null)
+      $this->requestTimeout = floatval($requestTimeout);
+    if($connectionTimeout !== null)
+      $this->connectionTimeout = floatval($connectionTimeout);
+  }
+
+  public function useApiVersion($version = null)
+  {
+    $this->apiVersion = $version;
+  }
+
+  public function useAsynchronous($async = true)
+  {
+    $this->isAsynchronous = (bool)$async;
+  }
+
+  // Public api interface for most calls GET/POST/DELETE
   public function delete($endpoint, $params = null)
   {
     return $this->request('DELETE', $endpoint, $params);
@@ -39,61 +72,11 @@ class EpiFoursquare extends EpiOAuth
     return $this->request('POST', $endpoint, $params);
   }
 
-  /* Basic auth methods */
-  public function delete_basic($endpoint, $params = null, $username = null, $password = null)
+  public function __construct($clientId = null, $clientSecret = null, $accessToken = null)
   {
-    return $this->request_basic('DELETE', $endpoint, $params, $username, $password);
-  }
-
-  public function get_basic($endpoint, $params = null, $username = null, $password = null)
-  {
-    return $this->request_basic('GET', $endpoint, $params, $username, $password);
-  }
-
-  public function post_basic($endpoint, $params = null, $username = null, $password = null)
-  {
-    return $this->request_basic('POST', $endpoint, $params, $username, $password);
-  }
-
-  public function useApiVersion($version = null)
-  {
-    $this->apiVersion = $version;
-  }
-
-  public function useAsynchronous($async = true)
-  {
-    $this->isAsynchronous = (bool)$async;
-  }
-
-  public function __construct($consumerKey = null, $consumerSecret = null, $oauthToken = null, $oauthTokenSecret = null)
-  {
-    parent::__construct($consumerKey, $consumerSecret, self::EPIFOURSQUARE_SIGNATURE_METHOD);
-    $this->setToken($oauthToken, $oauthTokenSecret);
-  }
-
-  public function __call($name, $params = null/*, $username, $password*/)
-  {
-    $parts  = explode('_', $name);
-    $method = strtoupper(array_shift($parts));
-    $parts  = implode('_', $parts);
-    $endpoint   = '/' . preg_replace('/[A-Z]|[0-9]+/e', "'/'.strtolower('\\0')", $parts) . '.json';
-    /* HACK: this is required for list support that starts with a user id */
-    $endpoint = str_replace('//','/',$endpoint);
-    $args = !empty($params) ? array_shift($params) : null;
-
-    // calls which do not have a consumerKey are assumed to not require authentication
-    if($this->consumerKey === null)
-    {
-      if(!empty($params))
-      {
-        $username = array_shift($params);
-        $password = !empty($params) ? array_shift($params) : null;
-      }
-
-      return $this->request_basic($method, $endpoint, $args, $username, $password);
-    }
-
-    return $this->request($method, $endpoint, $args);
+    $this->clientId = $clientId;
+    $this->clientSecret = $clientSecret;
+    $this->accessToken = $accessToken;
   }
 
   private function getApiUrl($endpoint)
@@ -104,19 +87,16 @@ class EpiFoursquare extends EpiOAuth
       return "{$this->apiUrl}{$endpoint}";
   }
 
-  private function request($method, $endpoint, $params = null)
+  private function request($method, $endpoint, $params = null, $username = null, $password = null)
   {
-    $url = $this->getUrl($this->getApiUrl($endpoint));
-    $resp= new EpiFoursquareJson(call_user_func(array($this, 'httpRequest'), $method, $url, $params, $this->isMultipart($params)), $this->debug);
-    if(!$this->isAsynchronous)
-      $resp->responseText;
+    if(preg_match('#^https?://#', $endpoint))
+      $url = $endpoint;
+    else
+      $url = $this->getApiUrl($endpoint);
 
-    return $resp;
-  }
+    if($this->accessToken)
+      $params['oauth_token'] = $this->accessToken;
 
-  private function request_basic($method, $endpoint, $params = null, $username = null, $password = null)
-  {
-    $url = $this->getApiUrl($endpoint);
     if($method === 'GET')
       $url .= is_null($params) ? '' : '?'.http_build_query($params, '', '&');
     $ch  = curl_init($url);
@@ -126,13 +106,8 @@ class EpiFoursquare extends EpiOAuth
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     if($method === 'POST' && $params !== null)
     {
-      if($this->isMultipart($params))
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-      else
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->buildHttpQueryRaw($params));
+      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
     }
-    if(!empty($username) && !empty($password))
-      curl_setopt($ch, CURLOPT_USERPWD, "{$username}:{$password}");
 
     $resp = new EpiFoursquareJson(EpiCurl::getInstance()->addCurl($ch), $this->debug);
     if(!$this->isAsynchronous)

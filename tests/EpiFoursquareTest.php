@@ -1,16 +1,17 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 require_once '../EpiCurl.php';
-require_once '../EpiOAuth.php';
 require_once '../EpiFoursquare.php';
 require_once 'PHPUnit/Framework.php';
 
 class EpiFoursquareTest extends PHPUnit_Framework_TestCase
 {
-  public $consumer_key = 'a40b1aece83e8d94a08fff1e94f87c2f04af2881a';
-  public $consumer_secret = 'e83c621567e6c430848db6dc5dde94b9';
-  public $token = 'UTWGJZOB0KO0BZPLBFSYNKRDBY0HG5ZWZQCPOBRPF51CFLPI';
-  public $secret= 'AYGH2BJ4UEHWDB5LBLTRTQ2OBTS41U4UVCGX5FWV222Z4YQI';
+  public $clientId = 'a40b1aece83e8d94a08fff1e94f87c2f04af2881a';
+  public $clientSecret = 'e83c621567e6c430848db6dc5dde94b9';
+  public $code = 'BFVH1JK5404ZUCI4GUTHGPWO3BUIUTEG3V3TKQ0IHVRVGVHS
+';
+  public $accessToken = 'DT32251AY1ED34V5ADCTNURTGSNHWXCNTOMTQM5ANJLBLO2O';
+  public $redirectUrl = 'http://mac.fa.com/callback.php';
   public $id = '25451974';
   public $email = 'jaisen+test@jmathai.com';
   public $password = 'password';
@@ -18,31 +19,28 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
   function setUp()
   {
     // key and secret for a test app (don't really care if this is public)
-    $this->fsObj = new EpiFoursquare($this->consumer_key, $this->consumer_secret, $this->token, $this->secret);
-    $this->fsObjUnAuth = new EpiFoursquare($this->consumer_key, $this->consumer_secret);
-    $this->fsObjBasic = new EpiFoursquare();
-    $this->fsObjBadAuth = new EpiFoursquare('foo', 'bar', 'foo', 'bar');
+    $this->fsObj = new EpiFoursquare($this->clientId, $this->clientSecret, $this->accessToken);
+    $this->fsObjUnAuth = new EpiFoursquare($this->clientId, $this->clientSecret);
+//  $this->fsObjBasic = new EpiFoursquare();
+//  $this->fsObjBadAuth = new EpiFoursquare('foo', 'bar', 'foo', 'bar');
   }
 
   function testGetAuthorizeurl()
   {
-    $aUrl = $this->fsObjUnAuth->getAuthorizeUrl();
-    $this->assertTrue(strstr($aUrl['url'], 'http://foursquare.com/oauth/authorize') !== false, 'Authenticate url did not contain member definition from EpiFoursquare class');
-    $this->assertTrue(!empty($aUrl['oauth_token']), 'Oauth token is empty');
-    $this->assertTrue(!empty($aUrl['oauth_token_secret']), 'Oauth secret is empty');
+    $aUrl = $this->fsObjUnAuth->getAuthorizeUrl($this->redirectUrl);
+    $this->assertEquals($aUrl, 'https://foursquare.com/oauth2/authenticate?client_id=a40b1aece83e8d94a08fff1e94f87c2f04af2881a&response_type=code&redirect_uri=http%3A%2F%2Fmac.fa.com%2Fcallback.php', 'Authorize url did not match');
   }
 
-  function testGetRequestToken()
+  function testGetAccessToken()
   {
-    $resp = $this->fsObjUnAuth->getRequestToken();
-    $this->assertTrue(strlen($resp->oauth_token) > 0, "oauth_token is longer than 0");
-    $this->assertTrue(strlen($resp->oauth_token_secret) > 0, "oauth_token_secret is longer than 0");
+    $resp = $this->fsObjUnAuth->getAccessToken($this->code, $this->redirectUrl);
+  $this->assertTrue(!empty($resp->access_token), "access token is empty ({$resp->access_token})");
   }
 
   function testCheckin()
   {
-    $resp = $this->fsObj->post('/checkin.json', array('vid' => '35610'));
-    $this->assertTrue($resp->checkin->id > 0, "Checkin id is not > 0");
+    $resp = $this->fsObj->post('/checkins/add', array('venueId' => '35610', 'broadcast' => 'public'));
+    $this->assertEquals($resp->meta->code, 200, "Meta code is not 200");
   }
 
 ///**

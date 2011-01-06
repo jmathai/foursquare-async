@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 require_once '../EpiCurl.php';
 require_once '../EpiFoursquare.php';
 require_once 'PHPUnit/Framework.php';
@@ -12,7 +12,7 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
 ';
   public $accessToken = 'DT32251AY1ED34V5ADCTNURTGSNHWXCNTOMTQM5ANJLBLO2O';
   public $redirectUrl = 'http://mac.fa.com/callback.php';
-  public $id = '25451974';
+  public $id = '5763863';
   public $email = 'jaisen+test@jmathai.com';
   public $password = 'password';
 
@@ -21,8 +21,6 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
     // key and secret for a test app (don't really care if this is public)
     $this->fsObj = new EpiFoursquare($this->clientId, $this->clientSecret, $this->accessToken);
     $this->fsObjUnAuth = new EpiFoursquare($this->clientId, $this->clientSecret);
-//  $this->fsObjBasic = new EpiFoursquare();
-//  $this->fsObjBadAuth = new EpiFoursquare('foo', 'bar', 'foo', 'bar');
   }
 
   function testGetAuthorizeurl()

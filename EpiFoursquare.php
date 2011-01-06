@@ -38,6 +38,11 @@ class EpiFoursquare
     return "{$this->requestTokenUrl}?{$qs}";
   }
 
+  public function setAccessToken($accessToken)
+  {
+    $this->accessToken = $accessToken;
+  }
+
   public function setTimeout($requestTimeout = null, $connectionTimeout = null)
   {
     if($requestTimeout !== null)

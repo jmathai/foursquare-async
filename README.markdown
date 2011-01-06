@@ -6,7 +6,7 @@ Foursquare-async
 
 ### An example usage
 
-Included in the repository are unit tests inside the @tests@ directory as well as an easy to run script names @simpleTest.php@. You can load @simpleTest.php@ up in a browser and you should see it working.
+Included in the repository are unit tests inside the `tests` directory as well as an easy to run script names `simpleTest.php`. You can load `simpleTest.php` up in a browser and you should see it working.
 
     $foursquare = new EpiFoursquare($clientId, $clientSecret);
     // http://developer.foursquare.com/docs/checkins/add.html
@@ -19,7 +19,7 @@ Included in the repository are unit tests inside the @tests@ directory as well a
 
 ### Documentation
 
-There's complete documentation available on Github at https://github.com/jmathai/foursquare-async/wiki..
+There's complete documentation available on Github at <https://github.com/jmathai/foursquare-async/wiki>..
 
 ### The authors
 

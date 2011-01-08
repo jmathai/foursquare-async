@@ -33,13 +33,13 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
   if(!isset($_COOKIE['access_token'])) {
     $token = $fsObjUnAuth->getAccessToken($_GET['code'], $redirectUri);
     setcookie('access_token', $token->access_token);
-    $_COOKIE['access_token'] = $token->_access_token;
+    $_COOKIE['access_token'] = $token->access_token;
   }
   $fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
   $badges = $fsObjUnAuth->get('/users/self/badges');
-}
 ?>
 <pre><?php var_dump($badges->response); ?></pre>
+<?php } ?>
 
 <hr>
 

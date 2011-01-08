@@ -1,11 +1,12 @@
 <?php
+ob_start();
 require_once 'EpiCurl.php';
 require_once 'EpiFoursquare.php';
 $clientId = 'a40b1aece83e8d94a08fff1e94f87c2f04af2881a';
 $clientSecret = 'e83c621567e6c430848db6dc5dde94b9';
 $code = 'BFVH1JK5404ZUCI4GUTHGPWO3BUIUTEG3V3TKQ0IHVRVGVHS';
 $accessToken = 'DT32251AY1ED34V5ADCTNURTGSNHWXCNTOMTQM5ANJLBLO2O';
-$redirectUrl = 'http://mac.fa.com/callback.php';
+$redirectUri = 'http://www.jaisenmathai.com/foursquare-async/simpleTest.php';
 $userId = '5763863';
 $fsObj = new EpiFoursquare($clientId, $clientSecret, $accessToken);
 $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
@@ -21,17 +22,33 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 
 <hr>
 
+<?php if(!isset($_GET['code']) && !isset($_COOKIE['access_token'])) { ?>
 <h2>Generate the authorization link</h2>
-<?php echo $fsObj->getAuthorizeUrl($redirectUrl); ?>
+<?php $authorizeUrl = $fsObjUnAuth->getAuthorizeUrl($redirectUri); ?>
+<a href="<?php echo $authorizeUrl; ?>"><?php echo $authorizeUrl; ?></a>
+
+<?php } else { ?>
+<h2>Display your own badges</h2>
+<?php
+  if(!isset($_COOKIE['access_token'])) {
+    $token = $fsObjUnAuth->getAccessToken($_GET['code'], $redirectUri);
+    setcookie('access_token', $token->access_token);
+    $_COOKIE['access_token'] = $token->_access_token;
+  }
+  $fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
+  $badges = $fsObjUnAuth->get('/users/self/badges');
+}
+?>
+<pre><?php var_dump($badges->response); ?></pre>
 
 <hr>
 
-<h2>Get a user's checkins</h2>
+<h2>Get a test user's checkins</h2>
 <?php
   $creds = $fsObj->get("/users/{$userId}/checkins");
 ?>
 <pre>
-<?php print_r($creds->response); ?>
+<?php var_dump($creds->response); ?>
 </pre>
 
 <hr>

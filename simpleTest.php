@@ -22,6 +22,12 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 
 <hr>
 
+<h2>Test an unauthenticated call to search for a venue</h2>
+<?php $venue = $fsObjUnAuth->get('/venues/search', array('ll' => '40.7,-74')); ?>
+<pre><?php var_dump($venue->response->response->groups->items[0]); ?></pre>
+
+<hr>
+
 <?php if(!isset($_GET['code']) && !isset($_COOKIE['access_token'])) { ?>
 <h2>Generate the authorization link</h2>
 <?php $authorizeUrl = $fsObjUnAuth->getAuthorizeUrl($redirectUri); ?>

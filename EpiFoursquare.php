@@ -92,7 +92,7 @@ class EpiFoursquare
       return "{$this->apiUrl}{$endpoint}";
   }
 
-  private function request($method, $endpoint, $params = null, $username = null, $password = null)
+  private function request($method, $endpoint, $params = null)
   {
     if(preg_match('#^https?://#', $endpoint))
       $url = $endpoint;
@@ -100,7 +100,14 @@ class EpiFoursquare
       $url = $this->getApiUrl($endpoint);
 
     if($this->accessToken)
+    {
       $params['oauth_token'] = $this->accessToken;
+    }
+    else
+    {
+      $params['client_id'] = $this->clientId;
+      $params['client_secret'] = $this->clientSecret;
+    }
 
     if($method === 'GET')
       $url .= is_null($params) ? '' : '?'.http_build_query($params, '', '&');

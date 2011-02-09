@@ -111,7 +111,6 @@ class EpiFoursquare
 
     if($method === 'GET')
       $url .= is_null($params) ? '' : '?'.http_build_query($params, '', '&');
-echo $url;
     $ch  = curl_init($url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

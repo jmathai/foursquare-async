@@ -24,7 +24,7 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 
 <h2>Test an unauthenticated call to search for a venue</h2>
 <?php $venue = $fsObjUnAuth->get('/venues/search', array('ll' => '40.7,-74')); ?>
-<pre><?php var_dump($venue->response->groups[0]->items[0]); die();?></pre>
+<pre><?php var_dump($venue->response->groups[0]->items[0]); ?></pre>
 
 <hr>
 

@@ -28,7 +28,7 @@ class EpiFoursquare
   {
     $params = array('client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'grant_type' => 'authorization_code', 'redirect_uri' => $redirectUri, 'code' => $code);
     $qs = http_build_query($params);
-    return $this->request('GET', "{$this->accessTokenUrl}?{$qs}");
+    return $this->request('GET', "{$this->accessTokenUrl}", $params);
   }
 
   public function getAuthorizeUrl($redirectUri)

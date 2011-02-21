@@ -11,6 +11,11 @@ $userId = '5763863';
 $fsObj = new EpiFoursquare($clientId, $clientSecret, $accessToken);
 $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 ?>
+<script type="text/javascript">
+function viewSource() {
+	document.getElementById("source").style.display = "block";
+}
+</script>
 
 <h1>Simple test to make sure everything works ok</h1>
 
@@ -34,27 +39,36 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 <a href="<?php echo $authorizeUrl; ?>"><?php echo $authorizeUrl; ?></a>
 
 <?php } else { ?>
-<h2>Display your own badges</h2>
-<?php
-  if(!isset($_COOKIE['access_token'])) {
-    $token = $fsObjUnAuth->getAccessToken($_GET['code'], $redirectUri);
-    setcookie('access_token', $token->access_token);
-    $_COOKIE['access_token'] = $token->access_token;
-  }
-  $fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
-  $badges = $fsObjUnAuth->get('/users/self/badges');
-?>
-<pre><?php var_dump($badges->response); ?></pre>
+	<h2>Display your own badges</h2>
+	<?php
+	if(!isset($_COOKIE['access_token'])) {
+		$token = $fsObjUnAuth->getAccessToken($_GET['code'], $redirectUri);
+		setcookie('access_token', $token->access_token);
+		$_COOKIE['access_token'] = $token->access_token;
+	}
+	$fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
+	$badges = $fsObjUnAuth->get('/users/self/badges');
+
+	// Process the returned object and display the badge images					
+	if (is_object($badges->response)) {
+		foreach ($badges->response->badges as $badge) {		
+			echo "<img src=\"".$badge->image->prefix.$badge->image->sizes->{1}.$badge->image->name."\" title=\"".$badge->name."\" />";
+		}
+	}
+	?>
+	<div style="height: 400px; overflow: auto; width: 100%; border: 2px solid #ccc;">
+		<pre><?php var_dump($badges->response); ?></pre>
+	</div>
 <?php } ?>
 
 <hr>
 
 <h2>Get a test user's checkins</h2>
 <?php
-  $creds = $fsObj->get("/users/{$userId}/checkins");
+$creds = $fsObj->get("/users/{$userId}/checkins");
 ?>
-<pre>
-<?php var_dump($creds->response); ?>
-</pre>
-
-<hr>
+<div style="height: 400px; overflow: auto; width: 100%; border: 2px solid #ccc;">
+	<pre>
+		<?php var_dump($creds->response); ?>
+	</pre>
+</div>

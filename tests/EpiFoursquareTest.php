@@ -46,10 +46,10 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
     $geolat = '41.438797';
     $geolon = '-97.351511';
     
-    $resp = $this->fsObj->post('/checkin.json', array('venue' => 'test', 'geolat' => $geolat, 'geolon' => $geolon));
-    $this->assertTrue($resp->checkin->id > 0, "Checkin id is not > 0");
-    $this->assertEquals($geolat, $resp->checkin->geolat, "Latitude not stored");
-    $this->assertEquals($geolon, $resp->checkin->geolon, "Longitude not stored");
+    $resp = $this->fsObj->post('/checkins/add', array('venue' => 'test ' . time(), 'geolat' => $geolat, 'geolon' => $geolon, 'broadcast' => 'private'));
+    $this->assertEquals($resp->meta->code, 200, "Checkin create response code  != 200");
+    $this->assertTrue(!empty($resp->response->checkin->location->lat), "Latitude not stored");
+    $this->assertTrue(!empty($resp->response->checkin->location->lon), "Longitude not stored");
   }
 
 ///**

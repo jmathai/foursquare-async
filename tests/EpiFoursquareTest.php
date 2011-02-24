@@ -41,6 +41,17 @@ class EpiFoursquareTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($resp->meta->code, 200, "Meta code is not 200");
   }
 
+  function testGeo()
+  {
+    $geolat = '41.438797';
+    $geolon = '-97.351511';
+    
+    $resp = $this->fsObj->post('/checkin.json', array('venue' => 'test', 'geolat' => $geolat, 'geolon' => $geolon));
+    $this->assertTrue($resp->checkin->id > 0, "Checkin id is not > 0");
+    $this->assertEquals($geolat, $resp->checkin->geolat, "Latitude not stored");
+    $this->assertEquals($geolon, $resp->checkin->geolon, "Longitude not stored");
+  }
+
 ///**
 //* @expectedException EpiTwitterNotAuthorizedException
 //*/

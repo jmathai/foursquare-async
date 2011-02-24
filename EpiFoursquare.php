@@ -14,7 +14,7 @@ class EpiFoursquare
   protected $clientId, $clientSecret, $accessToken;
   protected $requestTokenUrl= 'https://foursquare.com/oauth2/authenticate';
   protected $accessTokenUrl = 'https://foursquare.com/oauth2/access_token';
-  protected $authorizeUrl   = 'https://foursquare.com/oauth/authorize';
+  protected $authorizeUrl   = 'https://foursquare.com/oauth2/authorize';
   protected $apiUrl         = 'https://api.foursquare.com';
   protected $userAgent      = 'EpiFoursquare (http://github.com/jmathai/foursquare-async/tree/)';
   protected $apiVersion     = 'v2';

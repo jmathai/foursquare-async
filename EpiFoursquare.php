@@ -51,6 +51,11 @@ class EpiFoursquare
       $this->connectionTimeout = floatval($connectionTimeout);
   }
 
+  public function setUserAgent($agent)
+  {
+    $this->userAgent = $agent;
+  }
+
   public function useApiVersion($version = null)
   {
     $this->apiVersion = $version;
@@ -112,6 +117,7 @@ class EpiFoursquare
     if($method === 'GET')
       $url .= is_null($params) ? '' : '?'.http_build_query($params, '', '&');
     $ch  = curl_init($url);
+    curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);

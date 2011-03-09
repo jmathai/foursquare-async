@@ -23,6 +23,7 @@ class EpiFoursquare
   protected $connectionTimeout = 5;
   protected $requestTimeout = 30;
   protected $debug = false;
+  protected $verifyCert = false;
 
   public function getAccessToken($code, $redirectUri)
   {
@@ -112,14 +113,12 @@ class EpiFoursquare
     if($method === 'GET')
       $url .= is_null($params) ? '' : '?'.http_build_query($params, '', '&');
     $ch  = curl_init($url);
+    //print_r($url);exit;
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verifyCert);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    if(isset($_SERVER ['SERVER_ADDR']) && !empty($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] != '127.0.0.1')
-      curl_setopt($ch, CURLOPT_INTERFACE, $_SERVER ['SERVER_ADDR']);
     if($method === 'POST' && $params !== null)
     {
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));

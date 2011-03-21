@@ -1,0 +1,6 @@
+<?php
+$clientId = 'B5V5530TIE2OYSS0G1PVRK53PY1VUMISMBZGNEOYCFW2M415';
+$clientSecret = 'USG4LPFXIHKRIPAX2VXW1HKBU31VRG2MYQOIXPL1M4MHRCUZ';
+$redirectUri = 'http://shizhao.info/4sqr/index.php';
+$latidude_code = '-6308347716488309629';
+?>

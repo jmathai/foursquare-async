@@ -3,14 +3,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
 </head>
 <body>
-<div align="center"><img src="http://code.google.com/p/4sqr/logo?cct=1283331984" /><br />
-<?
-require_once 'EpiCurl.php';
-require_once 'EpiFoursquare.php';
-$clientId = 'GUU2AJRPK4LDBHIFQKTU31DXITIGLFKV1TOJGBJ2NRIKGFBW';
-$clientSecret = 'CSW5BUGITZ2LNF0MMD5UPDTTZGGJ2PN01CSZYY0L4ARUHGCZ';
-$redirectUri = 'http://shizhao.info/foursquare-async/simpleTest.php';
-#$fsObj = new EpiFoursquare($clientId, $clientSecret, $accessToken);
+<div align="center"><img src="logo.png" /><br />
+<?php
+require_once 'kernel/EpiCurl.php';
+require_once 'kernel/EpiFoursquare.php';
+require_once 'config.php';
 $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret, $_COOKIE['access_token']);
 
 
@@ -29,7 +26,7 @@ $venues = $fsObjUnAuth->post("/venues/add", array(
 ?>
 <div align='center'>
 Add new venue <strong> <? echo "$name" ?> </strong>, OK!<br >
-<?
+<?php
 $array = array($address,$city,$state);
 
 $adds = implode(", ", $array);

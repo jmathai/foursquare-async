@@ -1,23 +1,14 @@
-<?
-$latidude_code = $_COOKIE['latidude_code'];
+<?php
+require_once 'config.php';
 ?>
 <html> 
 <head> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
 </head>
 <body>
-<div align="center"><img src="http://code.google.com/p/4sqr/logo?cct=1283331984" /><br />
-<?
-//require_once 'EpiCurl.php';
-//require_once 'EpiFoursquare.php';
-//$clientId = 'GUU2AJRPK4LDBHIFQKTU31DXITIGLFKV1TOJGBJ2NRIKGFBW';
-//$clientSecret = 'CSW5BUGITZ2LNF0MMD5UPDTTZGGJ2PN01CSZYY0L4ARUHGCZ';
-//$redirectUri = 'http://shizhao.info/foursquare-async/simpleTest.php';
-include "latitude.php";
-//$fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
-
-//$foursquare = new Foursquare($phone, $pass);
-//$foursquare->format = "json";
+<div align="center"><img src="logo.png" /><br />
+<?php
+include "kernel/latitude.php";
 $new = $_GET['new'];
 
 if ($new ==1){

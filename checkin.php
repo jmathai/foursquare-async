@@ -3,16 +3,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
 </head>
 <body>
-<div align="center"><img src="http://code.google.com/p/4sqr/logo?cct=1283331984" /><br />
-<?
-require_once 'EpiCurl.php';
-require_once 'EpiFoursquare.php';
-$clientId = 'GUU2AJRPK4LDBHIFQKTU31DXITIGLFKV1TOJGBJ2NRIKGFBW';
-$clientSecret = 'CSW5BUGITZ2LNF0MMD5UPDTTZGGJ2PN01CSZYY0L4ARUHGCZ';
-$redirectUri = 'http://shizhao.info/foursquare-async/simpleTest.php';
-#$fsObj = new EpiFoursquare($clientId, $clientSecret, $accessToken);
+<div align="center"><img src="logo.png" /><br />
+<?php
+require_once 'kernel/EpiCurl.php';
+require_once 'kernel/EpiFoursquare.php';
+require_once 'config.php';
 $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret, $_COOKIE['access_token']);
-//$fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
 
 $id = $_POST['id'];
 $shout = $_POST['shout'];
@@ -46,7 +42,7 @@ $pcheckin = $fsObjUnAuth->post('/photos/add',array(
 ?>
 <center>
 
-<? 
+<?php
 
 $message = $checkin->notifications[0]->item->message;
 $add = $checkin->response->checkin->venue ->location->address;
@@ -54,8 +50,6 @@ $mayor = $checkin->notifications[1]->item->message;
 $score = $checkin->notifications[3]->item->scores;
 $total = $checkin->notifications[3]->item->total;
 
-?>
-<?
 $notification=$checkin ->notifications;
 foreach ($notification as $notifications){
  if ($notifications -> type == "message"){

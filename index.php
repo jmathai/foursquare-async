@@ -26,14 +26,16 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
         require_once "kernel/latitude.php";
         $fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
         $venues = $fsObjUnAuth->get('/venues/search', array('ll' => "{$latitude},{$longitude}", 'limit' => 50));
-        foreach ($venues->response->groups[0]->items as $venue) {
-            $name = $venue->name;
-            $id = $venue->id;	
-            $dist = $venue->location->distance;
-            $add = $venue->location->address;
-            $city = $venue->location->city;
-            $state = $venue->location->state;		
-            echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+        foreach ($venues->response->groups as $groups) {
+            foreach ($groups->items as $venue) {
+                $name = $venue->name;
+                $id = $venue->id;	
+                $dist = $venue->location->distance;
+                $add = $venue->location->address;
+                $city = $venue->location->city;
+                $state = $venue->location->state;		
+                echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+            }
         }
 
         echo "<hr /><a href='check.php?new=1'>Add venue</a><br />";
@@ -41,5 +43,6 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
         echo "<hr /><a href='logout.php'>Logout</a><br />";
     } ?>
 </div>
+<!--<pre align=left><?php //var_dump($venues->response->groups); ?></pre>-->
 </body> 
 </html>

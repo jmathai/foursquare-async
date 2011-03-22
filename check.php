@@ -56,7 +56,8 @@ else {
     echo "<input type='submit' value='Check in!'></form>";
     }
 ?>
-
+<hr />
+<small>Power by 4sqr.</small>
 </div>
 </body> 
 </html> 

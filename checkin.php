@@ -99,7 +99,8 @@ if  ($_FILES['photo']['name'] !=NULL){
     echo "<img src=\"{$myphoto}\" />";
 }
 ?>
-
+<hr />
+<small>Power by 4sqr.</small>
 </center>
 </body> 
 </html> 

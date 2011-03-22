@@ -43,6 +43,7 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
         echo "<a href=\"http://maps.google.com/?q=$latitude,$longitude\">I an here!</a><br />";
         echo "<a href='logout.php'>Logout</a><br />";
     } ?>
+<hr />
 <small>Power by 4sqr.</small>
 </div>
 </body> 

@@ -36,7 +36,8 @@ echo "$adds <br >";
 $id=$venues->response->venue->id;
 echo "<a href='check.php?id=$id&name=$name&add=$address&city=$city&state=$state'><b>Check in!</b></a><br />" ;
 ?>
-
+<hr />
+<small>Power by 4sqr.</small>
 </div>
 </body> 
 </html> 

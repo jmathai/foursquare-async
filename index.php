@@ -40,7 +40,7 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
         }
 
         echo "<hr /><a href='check.php?new=1'>Add venue</a><br />";
-        echo "<a href=\"http://maps.google.com/?q=$latitude,$longitude\">I an here!</a><br />";
+        echo "<a href=\"http://maps.google.com/?q=$latitude,$longitude\">I at here!</a><br />";
         echo "<a href='logout.php'>Logout</a><br />";
     } ?>
 <hr />

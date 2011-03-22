@@ -15,3 +15,8 @@
 1.5 - fixed Issue 6
     - login screen add latidude_code, not need conf/conf.php
     - Now latidude_code with minus sign (some latidude_code of user no with minus sign)
+
+2.0 - update to 4sq API V2, using foursquare-async, https://github.com/jmathai/foursquare-async
+    - rewrite code
+    - support upload photo
+

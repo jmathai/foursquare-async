@@ -8,6 +8,7 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 <html> 
 <head> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
+<meta name="robots" content="noindex">
 </head>
 <body>
 <div align="center"><img src="logo.png" /><br />
@@ -15,7 +16,7 @@ $fsObjUnAuth = new EpiFoursquare($clientId, $clientSecret);
 if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
     $authorizeUrl = $fsObjUnAuth->getAuthorizeUrl($redirectUri);
 ?>
-    <a href="<?php echo $authorizeUrl; ?>">authorization</a>
+    <a href="<?php echo $authorizeUrl; ?>"><img src="signinwith-foursquare.png" /></a>
     <?php } else { 
         if(!isset($_COOKIE['access_token'])) {
             $token = $fsObjUnAuth->getAccessToken($_GET['code'], $redirectUri);
@@ -40,9 +41,9 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
 
         echo "<hr /><a href='check.php?new=1'>Add venue</a><br />";
         echo "<a href=\"http://maps.google.com/?q=$latitude,$longitude\">I an here!</a><br />";
-        echo "<hr /><a href='logout.php'>Logout</a><br />";
+        echo "<a href='logout.php'>Logout</a><br />";
     } ?>
+<small>Power by 4sqr.</small>
 </div>
-<!--<pre align=left><?php //var_dump($venues->response->groups); ?></pre>-->
 </body> 
 </html>

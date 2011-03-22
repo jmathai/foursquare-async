@@ -1,6 +1,7 @@
 <html> 
 <head> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
+<meta name="robots" content="noindex">
 </head>
 <body>
 <div align="center"><img src="logo.png" /><br />
@@ -15,40 +16,53 @@ $shout = $_POST['shout'];
 $name = $_POST['name'];
 $geolat = $_POST['latitude'];
 $geolong = $_POST['longitude'];
-$photo = $_POST['media'];
+$privat = 'public';
 
-if  ($_POST['privat']== NULL){
-    $privat = 'public';
-    if  ($_POST['facebook']== 1)
-      $privat = 'public, facebook';
-    if  ($_POST['twitter']== 1)
-      $privat = 'public,facebook,twitter';
- }
-else {
-    $privat = 'private';
+if  ($_FILES['photo']['name'] == NULL){
+    if  ($_POST['privat']== NULL){
+        $privat = 'public';
+        if  ($_POST['facebook']== 1)
+          $privat = $privat.' ,facebook';
+        if  ($_POST['twitter']== 1)
+          $privat = $privat.' ,twitter';
+     }
+     else {
+        $privat = 'private';
+     }
 }
 
 $checkin = $fsObjUnAuth->post('/checkins/add',array(
     'venueId' => "{$id}", 'venue' => "{$name}", 'shout'=>"{$shout}", 'broadcast' => "{$privat}", 'll' => "{$geolat},{$geolong}"
   ));
 
-if  {$photo !=NULL){
+if  ($_FILES['photo']['name'] !=NULL){
 
-$pcheckin = $fsObjUnAuth->post('/photos/add',array(
-    'venueId' => "{$id}", 'broadcast' => "{$privat}", 'll' => "{$geolat},{$geolong}"
-  ));
+   if  (($_POST['twitter']== 1) &&  ($_POST['facebook']== 0)){
+      $privat = 'twitter';
+   }
+   elseif  (($_POST['twitter']== 0) && ($_POST['facebook']== 1)) {
+      $privat = 'facebook';
+   }
+   elseif  (($_POST['twitter']== 1) &&  ($_POST['facebook']== 1)) {
+      $privat = 'twitter,facebook';
+   }
+   else {
+      $privat = '';
+   }
+    $postVars = array();
+    $postVars['checkinId'] = $checkin->response->checkin->id;  
+    $postVars['ll'] = "{$geolat},{$geolong}";
+    $postVars['broadcast'] = "{$privat}";
+    $postVars['photo'] = '@'.$_FILES['photo']['tmp_name'];
+
+    $pcheckin = $fsObjUnAuth->post('/photos/add', $postVars, $up=1);
 }
-
 ?>
 <center>
 
 <?php
 
-$message = $checkin->notifications[0]->item->message;
 $add = $checkin->response->checkin->venue ->location->address;
-$mayor = $checkin->notifications[1]->item->message;
-$score = $checkin->notifications[3]->item->scores;
-$total = $checkin->notifications[3]->item->total;
 
 $notification=$checkin ->notifications;
 foreach ($notification as $notifications){
@@ -79,7 +93,13 @@ foreach ($notification as $notifications){
     echo "Total: $total pts<br>";
   }
 }
+if  ($_FILES['photo']['name'] !=NULL){
+    $myphoto=$pcheckin->response->photo->sizes->items[2]->url;
+    echo "Photo upload done!<br />";
+    echo "<img src=\"{$myphoto}\" />";
+}
 ?>
+
 </center>
 </body> 
 </html> 

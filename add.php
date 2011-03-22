@@ -1,6 +1,7 @@
 <html> 
 <head> 
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+<meta name="robots" content="noindex">
 </head>
 <body>
 <div align="center"><img src="logo.png" /><br />

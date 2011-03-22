@@ -4,6 +4,7 @@ require_once 'config.php';
 <html> 
 <head> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" > 
+<meta name="robots" content="noindex">
 </head>
 <body>
 <div align="center"><img src="logo.png" /><br />
@@ -41,7 +42,7 @@ else {
     $adds = implode(", ", $array);
 
     echo "$adds <br >"; 
-    echo "<form action='checkin.php' method='POST'>";
+    echo "<form action='checkin.php' method='POST' enctype=\"multipart/form-data\">";
 
     echo "<input type='hidden' name='id' value='$id'>";
     echo "<input type='hidden' name='name' value='$name'>";
@@ -50,8 +51,8 @@ else {
     echo "shout：<input size='30' name='shout' value=''><br>";
     echo "private: <input type='checkbox' name='privat' value='0' /><br>";
     echo "twitter: <input type='checkbox' name='twitter' checked value='1' /><br>";
-    echo "Facebook: <input type='checkbox' name='facebook' value='1' /><br>";
-    echo "Image: <input type='file' name='media' /><br />";
+    echo "Facebook: <input type='checkbox' name='facebook' checked value='1' /><br>";
+    echo "Photo: <input type='file' accept=\"image/jpeg\" name='photo' /><br />";
     echo "<input type='submit' value='Check in!'></form>";
     }
 ?>

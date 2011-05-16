@@ -1,7 +1,7 @@
 <?php
 ob_start();
-require_once 'EpiCurl.php';
-require_once 'EpiFoursquare.php';
+require_once 'kernel/EpiCurl.php';
+require_once 'kernel/EpiFoursquare.php';
 $clientId = 'a40b1aece83e8d94a08fff1e94f87c2f04af2881a';
 $clientSecret = 'e83c621567e6c430848db6dc5dde94b9';
 $code = 'BFVH1JK5404ZUCI4GUTHGPWO3BUIUTEG3V3TKQ0IHVRVGVHS';

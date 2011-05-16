@@ -28,18 +28,56 @@ if (!isset($_GET['code']) && !isset($_COOKIE['access_token'])){
         $fsObjUnAuth->setAccessToken($_COOKIE['access_token']);
         $venues = $fsObjUnAuth->get('/venues/search', array('ll' => "{$latitude},{$longitude}", 'limit' => 50));
         foreach ($venues->response->groups as $groups) {
-            foreach ($groups->items as $venue) {
-                $name = $venue->name;
-                $id = $venue->id;	
-                $dist = $venue->location->distance;
-                $add = $venue->location->address;
-                $city = $venue->location->city;
-                $state = $venue->location->state;		
-                echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+            if ($groups->type =='favorites'){
+                echo $groups->name.'<br />';
+                foreach ($groups->items as $venue) {
+                    $name = $venue->name;
+                    $id = $venue->id;	
+                    $dist = $venue->location->distance;
+                    $add = $venue->location->address;
+                    $city = $venue->location->city;
+                    $state = $venue->location->state;		
+                    echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+                 }
             }
+            elseif ($groups->type =='trending'){
+                echo $groups->name.'<br />';
+                foreach ($groups->items as $venue) {
+                    $name = $venue->name;
+                    $id = $venue->id;	
+                    $dist = $venue->location->distance;
+                    $add = $venue->location->address;
+                    $city = $venue->location->city;
+                    $state = $venue->location->state;		
+                    echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+                 }
+            }
+            elseif ($groups->type =='nearby') {
+                echo $groups->name.'<br />';
+                foreach ($groups->items as $venue) {
+                    $name = $venue->name;
+                    $id = $venue->id;	
+                    $dist = $venue->location->distance;
+                    $add = $venue->location->address;
+                    $city = $venue->location->city;
+                    $state = $venue->location->state;		
+                    echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+                 }
+            }
+            else {
+                foreach ($groups->items as $venue) {
+                    $name = $venue->name;
+                    $id = $venue->id;	
+                    $dist = $venue->location->distance;
+                    $add = $venue->location->address;
+                    $city = $venue->location->city;
+                    $state = $venue->location->state;		
+                    echo "<a href='check.php?id=$id&name=$name&add=$add&city=$city&state=$state'>$name</a> - $dist m<br />" ;
+                 }
+            }                                
         }
-
-        echo "<hr /><a href='check.php?new=1'>Add venue</a><br />";
+        echo "<hr /><a href='places.php'>Place Searches</a><br />";
+        echo "<a href='check.php?new=1'>Add venue</a><br />";
         echo "<a href=\"http://maps.google.com/?q=$latitude,$longitude\">I at here!</a><br />";
         echo "<a href='logout.php'>Logout</a><br />";
     } ?>

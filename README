@@ -19,4 +19,7 @@
 2.0 - update to 4sq API V2, using foursquare-async, https://github.com/jmathai/foursquare-async
     - rewrite code
     - support upload photo
+2.1 - fix Issue 12
+    - Search Venues: add favorites, trending,and nearby types
+    - Google Places Searches
 

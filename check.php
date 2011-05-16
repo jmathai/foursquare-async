@@ -9,23 +9,51 @@ require_once 'config.php';
 <body>
 <div align="center"><img src="logo.png" /><br />
 <?php
-include "kernel/latitude.php";
-$new = $_GET['new'];
 
+$new = $_GET['new'];
+$ref= $_GET['ref'];
+include "kernel/latitude.php";
 if ($new ==1){
-    echo "<div align='center'>";
-    echo "<form action='add.php' method='POST'>";
-    echo"<b>Add venue:<b><br>";
-    echo"<b>name:</b> <input size='30' name='name' value=''><br>";
-    echo "address: <input size='30' name='address' value=''><br>";
-    echo "crossstreet: <input size='30' name='crossstreet' value=''><br>";
-    echo "city: <input size='30' name='city' value=''><br>";
-    echo "state: <input size='30' name='state' value=''><br>";
-    echo "zip: <input size='30' name='zip' value=''><br>";
-    echo "phone: <input size='30' name='phone' value=''><br>";
-    echo "<input type='hidden' name='geolat' value='$latitude'>";
-    echo "<input type='hidden' name='geolong' value='$longitude'>";
-    echo "<input type='submit' value='Add'>";
+    if ($ref ==Null){
+      echo "<div align='center'>";
+      echo "<form action='add.php' method='POST'>";
+      echo"<b>Add venue:<b><br>";
+      echo"<b>name:</b> <input size='30' name='name' value=''><br>";
+      echo "address: <input size='30' name='address' value=''><br>";
+      echo "crossstreet: <input size='30' name='crossstreet' value=''><br>";
+      echo "city: <input size='30' name='city' value=''><br>";
+      echo "state: <input size='30' name='state' value=''><br>";
+      echo "zip: <input size='30' name='zip' value=''><br>";
+      echo "phone: <input size='30' name='phone' value=''><br>";
+      echo "<input type='hidden' name='geolat' value='$latitude'>";
+      echo "<input type='hidden' name='geolong' value='$longitude'>";
+      echo "<input type='submit' value='Add'>";
+      }
+    else {
+      $name=$placedetails["result"]["name"];
+      $address=$placedetails["result"]["formatted_address"];
+      if ($placedetails["result"]["address_components"] !=Null) {
+          foreach ($placedetails["result"]["address_components"] as $address_components) {
+            if ($address_components["types"][0]=="postal_code"){
+              $zip=$address_components["long_name"];
+              }
+            }
+          }
+      $phone=$placedetails["result"]["formatted_phone_number"];
+      echo "<div align='center'>";
+      echo "<form action='add.php' method='POST'>";
+      echo"<b>Add venue:<b><br>";
+      echo"<b>name:</b> <input size='30' name='name' value='$name'><br>";
+      echo "address: <input size='30' name='address' value='$address'><br>";
+      echo "crossstreet: <input size='30' name='crossstreet' value=''><br>";
+      echo "city: <input size='30' name='city' value=''><br>";
+      echo "state: <input size='30' name='state' value=''><br>";
+      echo "zip: <input size='30' name='zip' value='$zip'><br>";
+      echo "phone: <input size='30' name='phone' value='$phone'><br>";
+      echo "<input type='hidden' name='geolat' value='$latitude'>";
+      echo "<input type='hidden' name='geolong' value='$longitude'>";
+      echo "<input type='submit' value='Add'>";
+      }    
     }
 
 

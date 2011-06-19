@@ -32,6 +32,17 @@ class EpiCurl
       );
   }
 
+  public function addEasyCurl($ch)
+  {
+    $key = $this->getKey($ch);
+    $this->requests[$key] = $ch;
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, 'headerCallback'));
+    $done = array('handle' => $ch);
+    $this->storeResponse($done, false);
+    $this->startTimer($key);
+    return new EpiCurlManager($key);
+  }
+
   public function addCurl($ch)
   {
     $key = $this->getKey($ch);
@@ -68,14 +79,14 @@ class EpiCurl
       $innerSleepInt = $outerSleepInt = 1;
       while($this->running && ($this->execStatus == CURLM_OK || $this->execStatus == CURLM_CALL_MULTI_PERFORM))
       {
-        usleep($outerSleepInt);
+        usleep(intval($outerSleepInt));
         $outerSleepInt = intval(max(1, ($outerSleepInt*$this->sleepIncrement)));
         $ms=curl_multi_select($this->mc, 0);
         if($ms > 0)
         {
           do{
             $this->execStatus = curl_multi_exec($this->mc, $this->running);
-            usleep($innerSleepInt);
+            usleep(intval($innerSleepInt));
             $innerSleepInt = intval(max(1, ($innerSleepInt*$this->sleepIncrement)));
           }while($this->execStatus==CURLM_CALL_MULTI_PERFORM);
           $innerSleepInt = 1;
@@ -124,16 +135,26 @@ class EpiCurl
   {
     while($done = curl_multi_info_read($this->mc))
     {
-      $key = (string)$done['handle'];
-      $this->stopTimer($key, $done);
-      $this->responses[$key]['data'] = curl_multi_getcontent($done['handle']);
-      foreach($this->properties as $name => $const)
-      {
-        $this->responses[$key][$name] = curl_getinfo($done['handle'], $const);
-      }
-      curl_multi_remove_handle($this->mc, $done['handle']);
-      curl_close($done['handle']);
+      $this->storeResponse($done);
     }
+  }
+
+  private function storeResponse($done, $isAsynchronous = true)
+  {
+    $key = $this->getKey($done['handle']);
+    $this->stopTimer($key, $done);
+    if($isAsynchronous)
+      $this->responses[$key]['data'] = curl_multi_getcontent($done['handle']);
+    else
+      $this->responses[$key]['data'] = curl_exec($done['handle']);
+
+    foreach($this->properties as $name => $const)
+    {
+      $this->responses[$key][$name] = curl_getinfo($done['handle'], $const);
+    }
+    if($isAsynchronous)
+      curl_multi_remove_handle($this->mc, $done['handle']);
+    curl_close($done['handle']);
   }
 
   private function startTimer($key)

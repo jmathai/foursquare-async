@@ -89,6 +89,14 @@ class EpiFoursquare
     $this->accessToken = $accessToken;
   }
 
+  protected function executeCurl($ch)
+  {
+    if($this->isAsynchronous)
+      return EpiCurl::getInstance()->addCurl($ch);
+    else
+      return EpiCurl::getInstance()->addEasyCurl($ch);
+  }
+
   private function getApiUrl($endpoint)
   {
     if(!empty($this->apiVersion))
@@ -131,10 +139,7 @@ class EpiFoursquare
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
     }
 
-    $resp = new EpiFoursquareJson(EpiCurl::getInstance()->addCurl($ch), $this->debug);
-    if(!$this->isAsynchronous)
-      $resp->responseText;
-
+    $resp = new EpiFoursquareJson($this->executeCurl($ch), $this->debug);
     return $resp;
   }
 }

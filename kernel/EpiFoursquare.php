@@ -77,9 +77,9 @@ class EpiFoursquare
     return $this->request('GET', $endpoint, $params);
   }
 
-  public function post($endpoint, $params = null)
+  public function post($endpoint, $params = null, $up = 0)
   {
-    return $this->request('POST', $endpoint, $params);
+    return $this->request('POST', $endpoint, $params, $up);
   }
 
   public function __construct($clientId = null, $clientSecret = null, $accessToken = null)
@@ -97,7 +97,7 @@ class EpiFoursquare
       return "{$this->apiUrl}{$endpoint}";
   }
 
-  private function request($method, $endpoint, $params = null)
+  private function request($method, $endpoint, $params = null, $up = 0)
   {
     if(preg_match('#^https?://#', $endpoint))
       $url = $endpoint;
@@ -128,7 +128,11 @@ class EpiFoursquare
       curl_setopt($ch, CURLOPT_INTERFACE, $_SERVER ['SERVER_ADDR']);
     if($method === 'POST' && $params !== null)
     {
-      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+      if ($up == 0) {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+      } else {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+      }
     }
 
     $resp = new EpiFoursquareJson(EpiCurl::getInstance()->addCurl($ch), $this->debug);

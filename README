@@ -1,0 +1,25 @@
+1.0 - Initial relsese
+1.1 - Remaked the Google Laitiude code
+	- minor changes to the index.php
+	- removed the shout form in check.php (the damm PHP Class does not work for shouting)
+	- Private check in works
+	- 
+1.2 - now can add venue
+    - fix POST error
+    - show checkin response
+    - add shout, but not work
+    - suppot twitter & facebook
+1.3 - shout now work
+1.4 - add login screen, and logout
+    - add 4sqr logo
+1.5 - fixed Issue 6
+    - login screen add latidude_code, not need conf/conf.php
+    - Now latidude_code with minus sign (some latidude_code of user no with minus sign)
+
+2.0 - update to 4sq API V2, using foursquare-async, https://github.com/jmathai/foursquare-async
+    - rewrite code
+    - support upload photo
+2.1 - fix Issue 12
+    - Search Venues: add favorites, trending,and nearby types
+    - Google Places Searches
+

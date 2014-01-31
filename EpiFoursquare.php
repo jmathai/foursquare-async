@@ -18,6 +18,7 @@ class EpiFoursquare
   protected $apiUrl         = 'https://api.foursquare.com';
   protected $userAgent      = 'EpiFoursquare (http://github.com/jmathai/foursquare-async/tree/)';
   protected $apiVersion     = 'v2';
+  protected $apiParams      = array('v' => '20131016');
   protected $isAsynchronous = false;
   protected $followLocation = false;
   protected $connectionTimeout = 5;
@@ -99,6 +100,7 @@ class EpiFoursquare
 
   private function request($method, $endpoint, $params = null)
   {
+    $params = array_merge((array)$params, $this->apiParams);
     if(preg_match('#^https?://#', $endpoint))
       $url = $endpoint;
     else
@@ -170,28 +172,28 @@ class EpiFoursquareJson implements ArrayAccess, Countable, IteratorAggregate
   {
     return count($this->response);
   }
-  
+
   // Next four functions are to support ArrayAccess interface
   // 1
-  public function offsetSet($offset, $value) 
+  public function offsetSet($offset, $value)
   {
     $this->response[$offset] = $value;
   }
 
   // 2
-  public function offsetExists($offset) 
+  public function offsetExists($offset)
   {
     return isset($this->response[$offset]);
   }
-  
+
   // 3
-  public function offsetUnset($offset) 
+  public function offsetUnset($offset)
   {
     unset($this->response[$offset]);
   }
 
   // 4
-  public function offsetGet($offset) 
+  public function offsetGet($offset)
   {
     return isset($this->response[$offset]) ? $this->response[$offset] : null;
   }
@@ -232,12 +234,12 @@ class EpiFoursquareJson implements ArrayAccess, Countable, IteratorAggregate
   }
 }
 
-class EpiFoursquareException extends Exception 
+class EpiFoursquareException extends Exception
 {
   public static function raise($response, $debug)
   {
     $message = $response->data;
- 
+
     switch($response->code)
     {
       case 400:
